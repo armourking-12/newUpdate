@@ -95,7 +95,7 @@ export const ALLOWED_FILE_TYPES = [
   "image/webp",
 ] as const;
 
-/** Firestore collection names */
+/** MongoDB collection names */
 export const COLLECTIONS = {
   users: "users",
   resources: "resources",

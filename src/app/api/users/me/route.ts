@@ -18,13 +18,14 @@ export async function GET() {
     let user = await User.findOne({ clerkId: clerkUser.id }).lean();
 
     const email = clerkUser.emailAddresses[0]?.emailAddress || "";
+    const isEmailVerified = clerkUser.emailAddresses[0]?.verification?.status === "verified";
 
-    // Auto-sync mechanism: If user doesn't exist by clerkId, try to find them by email.
-    if (!user && email) {
+    // Auto-sync mechanism: If user doesn't exist by clerkId, only link if the email address is verified
+    if (!user && email && isEmailVerified) {
       user = await User.findOne({ email }).lean();
       if (user) {
         // Link the existing account to this Clerk ID
-        await User.updateOne({ email }, { $set: { clerkId: clerkUser.id } });
+        await User.updateOne({ email }, { $set: { clerkId: clerkUser.id, emailVerified: true } });
         user.clerkId = clerkUser.id;
       }
     }

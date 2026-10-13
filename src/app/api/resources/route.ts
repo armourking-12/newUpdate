@@ -4,6 +4,8 @@ import connectToDatabase from "@/lib/db/mongoose";
 import { Resource } from "@/lib/db/models/Resource";
 import { User } from "@/lib/db/models/User";
 
+import { escapeRegex } from "@/lib/utils";
+
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
@@ -22,12 +24,13 @@ export async function GET(request: Request) {
     const query: any = { status: "approved" };
 
     if (q) {
-      // Simple regex search across title, subject, course, and tags
+      const safeQ = escapeRegex(q);
+      // Regex search across title, subject, course, and tags safely
       query.$or = [
-        { title: { $regex: q, $options: "i" } },
-        { subject: { $regex: q, $options: "i" } },
-        { course: { $regex: q, $options: "i" } },
-        { tags: { $regex: q, $options: "i" } },
+        { title: { $regex: safeQ, $options: "i" } },
+        { subject: { $regex: safeQ, $options: "i" } },
+        { course: { $regex: safeQ, $options: "i" } },
+        { tags: { $regex: safeQ, $options: "i" } },
       ];
     }
 
@@ -36,7 +39,7 @@ export async function GET(request: Request) {
     }
 
     if (university) {
-      query.university = { $regex: university, $options: "i" };
+      query.university = { $regex: escapeRegex(university), $options: "i" };
     }
 
     // Build sort

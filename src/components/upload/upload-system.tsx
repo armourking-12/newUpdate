@@ -188,14 +188,18 @@ export function UploadSystem() {
       });
 
       if (!response.ok) {
-        const errData = await response.json();
+        const errData = await response.json().catch(() => ({}));
         
         if (response.status === 409 && errData.error === "SIMILAR_DUPLICATE") {
           setSimilarWarning(errData.message);
           return;
         }
         
-        throw new Error(errData.message || "Upload failed");
+        const detailMsg = Array.isArray(errData.details) && errData.details.length > 0
+          ? `${errData.details[0].path?.join(".") || "Field"}: ${errData.details[0].message}`
+          : null;
+        const errorMsg = errData.message || detailMsg || errData.error || "Upload failed";
+        throw new Error(errorMsg);
       }
 
       queryClient.invalidateQueries({ queryKey: ["userStats"] });

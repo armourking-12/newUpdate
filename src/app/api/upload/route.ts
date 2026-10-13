@@ -6,6 +6,7 @@ import { Resource } from "@/lib/db/models/Resource";
 import { User } from "@/lib/db/models/User";
 import { uploadResource } from "@/lib/storage/index";
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { escapeRegex } from "@/lib/utils";
 
 export const maxDuration = 60; // Allow long uploads
 
@@ -27,10 +28,11 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "User profile not found and could not be synced" }, { status: 403 });
       }
       const email = clerkUser.emailAddresses[0]?.emailAddress || "";
+      const isEmailVerified = clerkUser.emailAddresses[0]?.verification?.status === "verified";
       const name = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || "Student";
-      const existingUser = await User.findOne({ email }).lean();
+      const existingUser = (email && isEmailVerified) ? await User.findOne({ email }).lean() : null;
       if (existingUser) {
-        await User.updateOne({ email }, { $set: { clerkId: clerkUser.id } });
+        await User.updateOne({ email }, { $set: { clerkId: clerkUser.id, emailVerified: true } });
         user = existingUser;
         user.clerkId = clerkUser.id;
       } else {
@@ -89,7 +91,9 @@ export async function POST(request: Request) {
     const { uploadSchema } = await import("@/lib/validations");
     const validation = uploadSchema.safeParse(uploadData);
     if (!validation.success) {
-      return NextResponse.json({ error: "Invalid form data", details: validation.error.issues }, { status: 400 });
+      const firstIssue = validation.error.issues[0];
+      const message = firstIssue ? `${firstIssue.path.join(".")}: ${firstIssue.message}` : "Invalid form data";
+      return NextResponse.json({ error: "Invalid form data", message, details: validation.error.issues }, { status: 400 });
     }
     const tags = uploadData.tags.split(",").map(t => t.trim()).filter(Boolean);
 
@@ -131,10 +135,10 @@ export async function POST(request: Request) {
     // 9. Similar duplicate check (metadata) – unless user opted to ignore
     if (!ignoreSimilar) {
       const similarQuery = {
-        university: { $regex: new RegExp(`^${uploadData.university}$`, "i") },
-        course: { $regex: new RegExp(`^${uploadData.course}$`, "i") },
+        university: { $regex: new RegExp(`^${escapeRegex(uploadData.university)}$`, "i") },
+        course: { $regex: new RegExp(`^${escapeRegex(uploadData.course)}$`, "i") },
         semester: uploadData.semester,
-        subject: { $regex: new RegExp(`^${uploadData.subject}$`, "i") },
+        subject: { $regex: new RegExp(`^${escapeRegex(uploadData.subject)}$`, "i") },
         year: uploadData.year,
         examType: uploadData.examType || { $exists: false },
       };
@@ -187,6 +191,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, resourceId: newResource._id });
   } catch (error) {
     console.error("Upload API Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Internal Server Error";
+    return NextResponse.json({ error: "Internal Server Error", message }, { status: 500 });
   }
 }

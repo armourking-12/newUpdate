@@ -170,6 +170,16 @@ export function ResourcesClient() {
     setPage(1);
   };
 
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    const catalogElement = document.getElementById("catalog-section");
+    if (catalogElement) {
+      catalogElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      window.scrollTo({ top: 350, behavior: "smooth" });
+    }
+  };
+
   const resources = data?.data || [];
   const pagination = data?.pagination;
 
@@ -210,7 +220,7 @@ export function ResourcesClient() {
       </section>
 
       {/* Filters & Results */}
-      <section className="py-8 md:py-12">
+      <section id="catalog-section" className="py-8 md:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Filter Chips */}
           <div className="flex flex-wrap items-center gap-2 mb-8">
@@ -246,7 +256,11 @@ export function ResourcesClient() {
           ) : (
             <>
               {/* Resource Cards */}
-              <AnimatedContainer variant="stagger">
+              <AnimatedContainer
+                key={`page-${page}-${activeType}-${debouncedQuery}`}
+                variant="stagger"
+                viewport={false}
+              >
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {resources.map((resource: any) => (
                     <AnimatedItem key={resource._id}>
@@ -327,9 +341,10 @@ export function ResourcesClient() {
               {pagination && pagination.pages > 1 && (
                 <div className="mt-12 flex items-center justify-center gap-2">
                   <button
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    onClick={() => handlePageChange(Math.max(1, page - 1))}
                     disabled={page === 1}
                     className="inline-flex items-center justify-center rounded-lg border border-border p-2 hover:bg-muted disabled:opacity-50"
+                    aria-label="Previous page"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </button>
@@ -337,9 +352,10 @@ export function ResourcesClient() {
                     Page {page} of {pagination.pages}
                   </span>
                   <button
-                    onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
+                    onClick={() => handlePageChange(Math.min(pagination.pages, page + 1))}
                     disabled={page === pagination.pages}
                     className="inline-flex items-center justify-center rounded-lg border border-border p-2 hover:bg-muted disabled:opacity-50"
+                    aria-label="Next page"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </button>

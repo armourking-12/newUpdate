@@ -23,9 +23,13 @@ export async function GET() {
     
     const totalDownloads = downloadsAggregation.length > 0 ? downloadsAggregation[0].totalDownloads : 0;
 
-    // Optional: Count unique universities, but that might be heavy. Let's just return a static number or estimate based on distinct values if small.
-    const universitiesList = await Resource.distinct("university", { status: "approved" });
-    const totalUniversities = Math.max(universitiesList.length, 1); // at least 1
+    // Count unique universities case-insensitively
+    const universitiesAggregation = await Resource.aggregate([
+      { $match: { status: "approved", university: { $exists: true, $ne: "" } } },
+      { $group: { _id: { $toUpper: { $trim: { input: "$university" } } } } },
+      { $count: "total" }
+    ]);
+    const totalUniversities = universitiesAggregation.length > 0 ? universitiesAggregation[0].total : 0;
 
     return NextResponse.json({
       success: true,

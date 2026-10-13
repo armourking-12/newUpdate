@@ -15,7 +15,7 @@ export interface IResource extends Document {
   fileSize: number;
   fileHash: string; // SHA-256 to prevent duplicates
   thumbnailUrl?: string; // Cloudinary auto-generated thumbnail
-  storageProvider: "cloudinary" | "github"; // Track where it's stored
+  storageProvider: "cloudinary" | "postgres" | "github"; // Track where it's stored
   uploadedBy: {
     userId: mongoose.Types.ObjectId;
     name: string;
@@ -48,7 +48,7 @@ const ResourceSchema = new Schema<IResource>(
     fileSize: { type: Number, required: true },
     fileHash: { type: String, required: true, unique: true },
     thumbnailUrl: { type: String },
-    storageProvider: { type: String, enum: ["cloudinary", "github"], required: true },
+    storageProvider: { type: String, enum: ["cloudinary", "postgres", "github"], required: true },
     uploadedBy: {
       userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
       name: { type: String, required: true },

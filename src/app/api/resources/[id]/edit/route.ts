@@ -15,7 +15,13 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { title, description, type, university, course, semester, subject, year } = body;
+    const { uploadSchema } = await import("@/lib/validations");
+    const editSchema = uploadSchema.partial();
+    const validation = editSchema.safeParse(body);
+    if (!validation.success) {
+      const message = validation.error.issues[0]?.message || "Invalid update data";
+      return NextResponse.json({ error: "Invalid data", message }, { status: 400 });
+    }
 
     const { id } = await params;
     await connectToDatabase();
@@ -38,15 +44,17 @@ export async function PATCH(
       return NextResponse.json({ error: "Forbidden: You don't own this resource" }, { status: 403 });
     }
 
-    // Update fields
-    if (title) resource.title = title;
-    if (description) resource.description = description;
-    if (type) resource.type = type;
-    if (university) resource.university = university;
-    if (course) resource.course = course;
-    if (semester) resource.semester = Number(semester);
-    if (subject) resource.subject = subject;
-    if (year) resource.year = Number(year);
+    // Update validated fields
+    const validData = validation.data;
+    if (validData.title !== undefined) resource.title = validData.title;
+    if (validData.description !== undefined) resource.description = validData.description;
+    if (validData.type !== undefined) resource.type = validData.type;
+    if (validData.university !== undefined) resource.university = validData.university;
+    if (validData.course !== undefined) resource.course = validData.course;
+    if (validData.semester !== undefined) resource.semester = validData.semester;
+    if (validData.subject !== undefined) resource.subject = validData.subject;
+    if (validData.year !== undefined) resource.year = validData.year;
+    if (validData.examType !== undefined) resource.examType = validData.examType;
 
     // Note: We leave the `status` unchanged, so if it was approved, it remains approved.
     

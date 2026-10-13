@@ -1,22 +1,29 @@
 import { uploadToCloudinary, deleteFromCloudinary } from "./cloudinary";
-import { uploadToGithub, deleteFromGithub, type GithubStorageMetadata } from "./github";
+import { uploadToPostgres, deleteFromPostgres } from "./postgres";
 
-const FIVE_MB = 5 * 1024 * 1024;
+export interface DocumentStorageMetadata {
+  university?: string;
+  course?: string;
+  semester?: number;
+  subject?: string;
+  year?: number;
+  examType?: string;
+}
 
 export interface StorageUploadResult {
   url: string;
-  provider: "cloudinary" | "github";
+  provider: "cloudinary" | "postgres";
   publicId?: string;
 }
 
 /**
- * Automatically routes the upload to Cloudinary (images) or GitHub (documents like PDFs).
+ * Automatically routes the upload to Cloudinary (images) or Neon PostgreSQL (documents like PDFs).
  */
 export async function uploadResource(
   fileBuffer: Buffer,
   fileName: string,
   mimeType: string,
-  metadata: GithubStorageMetadata
+  _metadata?: DocumentStorageMetadata
 ): Promise<StorageUploadResult> {
   // If file is an image, use Cloudinary
   if (mimeType.startsWith("image/")) {
@@ -28,9 +35,9 @@ export async function uploadResource(
     };
   }
 
-  // Otherwise (PDF, DOCX, PPTX), use GitHub Storage
-  const url = await uploadToGithub(fileBuffer, fileName, metadata);
-  return { url, provider: "github" };
+  // Otherwise (PDF, DOCX, PPTX), store in Neon PostgreSQL
+  const url = await uploadToPostgres(fileBuffer, fileName, mimeType);
+  return { url, provider: "postgres" };
 }
 
 /**
@@ -38,11 +45,14 @@ export async function uploadResource(
  */
 export async function deleteResource(
   urlOrPublicId: string,
-  provider: "cloudinary" | "github"
+  provider: "cloudinary" | "postgres" | "github"
 ): Promise<void> {
-  if (provider === "github") {
-    await deleteFromGithub(urlOrPublicId);
-  } else {
+  if (provider === "postgres") {
+    await deleteFromPostgres(urlOrPublicId);
+  } else if (provider === "cloudinary") {
     await deleteFromCloudinary(urlOrPublicId);
+  } else if (provider === "github") {
+    // Legacy support: GitHub storage removed
+    console.warn("Legacy GitHub resource deletion skipped:", urlOrPublicId);
   }
 }

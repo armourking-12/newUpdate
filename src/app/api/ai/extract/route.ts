@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { auth } from "@clerk/nextjs/server";
 
 export const maxDuration = 60; // Allow 60 seconds for AI processing
 
@@ -7,6 +8,12 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(request: Request) {
   try {
+    // 1. Authenticate user
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
         { error: "Gemini API key is not configured" },
@@ -14,6 +21,31 @@ export async function POST(request: Request) {
       );
     }
 
+    // 2. Rate limiting (10 AI requests per minute per user)
+    const now = Date.now();
+    const windowMs = 60 * 1000;
+    const limit = 10;
+    const rateLimitMap: Map<string, { count: number; start: number }> =
+      (globalThis as any).__aiRateLimitMap || new Map();
+    (globalThis as any).__aiRateLimitMap = rateLimitMap;
+
+    const record = rateLimitMap.get(userId) || { count: 0, start: now };
+    if (now - record.start > windowMs) {
+      record.count = 1;
+      record.start = now;
+    } else {
+      record.count += 1;
+    }
+    rateLimitMap.set(userId, record);
+
+    if (record.count > limit) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please wait a moment before extracting again." },
+        { status: 429 }
+      );
+    }
+
+    // 3. Parse and validate body
     const body = await request.json();
     const { fileBase64, mimeType } = body;
 

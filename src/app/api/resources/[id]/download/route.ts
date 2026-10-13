@@ -11,7 +11,25 @@ export async function POST(
   try {
     const { id } = await params;
 
+    // Rate-limiting cooldown: prevent reputation farming from automated loops (10s per resource per IP)
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const cacheKey = `${id}:${ip}`;
+    const now = Date.now();
+    const downloadCooldownMap: Map<string, number> =
+      (globalThis as any).__downloadCooldownMap || new Map();
+    (globalThis as any).__downloadCooldownMap = downloadCooldownMap;
+
     await connectToDatabase();
+
+    const lastDownload = downloadCooldownMap.get(cacheKey) || 0;
+    if (now - lastDownload < 10000) {
+      const existing = await Resource.findById(id).select("downloads").lean();
+      if (!existing) {
+        return NextResponse.json({ error: "Resource not found" }, { status: 404 });
+      }
+      return NextResponse.json({ success: true, downloads: existing.downloads });
+    }
+    downloadCooldownMap.set(cacheKey, now);
 
     const resource = await Resource.findByIdAndUpdate(
       id,

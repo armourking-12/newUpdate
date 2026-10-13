@@ -77,3 +77,9 @@ export function getInitials(name: string): string {
 export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+/** Escape special regex characters to prevent ReDoS and regex syntax errors */
+export function escapeRegex(text: string): string {
+  if (!text) return "";
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}

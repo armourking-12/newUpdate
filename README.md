@@ -24,7 +24,7 @@
 
 ### 3. ☁️ Hybrid Dual-Cloud Storage Engine
 * **Images & Small Documents (<10MB)**: Stored in **Cloudinary** with on-the-fly thumbnail generation, format optimization, and forced download attachments (`fl_attachment`).
-* **Large Files & PDFs (>10MB / DOCX / PPTX)**: Programmatically committed to a dedicated GitHub repository via the **Octokit REST API** in structured directory paths (`University/Course/Sem_X/Subject/Year/ExamType/fileName`) and served via global **jsDelivr CDN**.
+* **Documents & PDFs (PDF / DOCX / PPTX)**: Stored directly in **Neon PostgreSQL** via `@neondatabase/serverless` BYTEA storage and served dynamically through optimized Next.js streaming endpoints (`/api/files/[id]`).
 
 ### 4. 🏆 Gamification & Leaderboard System
 * **Reputation Points**: Earn reputation points for contributing approved resources and reaching download milestones.
@@ -55,7 +55,7 @@
 | **Authentication** | Clerk (`@clerk/nextjs` v7.5) | OAuth login, session handling, user metadata, and Svix webhooks |
 | **Database** | MongoDB Atlas via Mongoose 9.7 | Connection pooling, indexing, schema validations |
 | **AI Integration** | Google Gemini 2.5 Flash | Multimodal document parsing & OCR metadata extraction |
-| **Asset Storage** | Cloudinary + GitHub REST API | Dual storage routing for media and documents |
+| **Asset Storage** | Cloudinary + Neon PostgreSQL | Dual storage routing for media and documents |
 | **Styling & UI** | Tailwind CSS v4, Base-UI (`shadcn`) | Modern typography, fluid animations, responsive layouts |
 | **Animation** | `motion/react` (Framer Motion) | Smooth page headers, staggered grids, and card transitions |
 | **Data Fetching** | `@tanstack/react-query` v5 | Client-side caching, optimistic mutations, refetch invalidation |
@@ -158,10 +158,8 @@ CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 
-# GitHub Document Storage (>10MB files, PDFs, DOCX)
-GITHUB_STORAGE_TOKEN=your_github_personal_access_token
-GITHUB_STORAGE_OWNER=your_github_username_or_org
-GITHUB_STORAGE_REPO=your_storage_repository_name
+# Neon PostgreSQL Document Storage (PDFs, DOCX, PPTX)
+DATABASE_URL=postgresql://neondb_owner:...@ep-...-pooler.c-4.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
 
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...

@@ -103,6 +103,8 @@ export function ResourceDetailsClient({ initialResource }: { initialResource: an
         if (parts.length === 2) {
           downloadUrl = `${parts[0]}/upload/fl_attachment/${parts[1]}`;
         }
+      } else if (downloadUrl.startsWith("/api/files/")) {
+        downloadUrl = downloadUrl.includes("?") ? `${downloadUrl}&download=1` : `${downloadUrl}?download=1`;
       }
       
       const a = document.createElement("a");

@@ -1,5 +1,4 @@
 "use client";
-import { useMemo } from "react";
 
 import { motion, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -43,12 +42,20 @@ const childVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
+const motionComponents = {
+  div: motion.div,
+  section: motion.section,
+  article: motion.article,
+  main: motion.main,
+  ul: motion.ul,
+};
+
 interface AnimatedContainerProps {
   children: React.ReactNode;
   variant?: keyof typeof containerVariants;
   delay?: number;
   className?: string;
-  as?: "div" | "section" | "article" | "main" | "ul";
+  as?: keyof typeof motionComponents;
   viewport?: boolean;
 }
 
@@ -60,7 +67,7 @@ export function AnimatedContainer({
   as = "div",
   viewport = true,
 }: AnimatedContainerProps) {
-  const Component = useMemo(() => motion.create(as), [as]);
+  const Component = motionComponents[as] || motion.div;
   const variants = containerVariants[variant];
 
   return (

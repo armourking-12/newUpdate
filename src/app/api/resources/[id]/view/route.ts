@@ -32,6 +32,9 @@ export async function POST(
     // Check if the identifier has already viewed this resource
     if (!resource.viewedBy.includes(identifier)) {
       resource.viewedBy.push(identifier);
+      if (resource.viewedBy.length > 500) {
+        resource.viewedBy.shift(); // Bound array size to prevent MongoDB 16MB document overflow
+      }
       resource.views += 1;
       await resource.save();
     }

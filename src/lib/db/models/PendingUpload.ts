@@ -15,7 +15,7 @@ export interface IPendingUpload extends Document {
   fileSize: number;
   fileHash: string; // SHA-256 to prevent duplicates
   thumbnailUrl?: string;
-  storageProvider: "cloudinary" | "github";
+  storageProvider: "cloudinary" | "postgres" | "github";
   uploadedBy: {
     userId: mongoose.Types.ObjectId;
     name: string;
@@ -46,7 +46,7 @@ const PendingUploadSchema = new Schema<IPendingUpload>(
     fileSize: { type: Number, required: true },
     fileHash: { type: String, required: true, unique: true },
     thumbnailUrl: { type: String },
-    storageProvider: { type: String, enum: ["cloudinary", "github"], required: true },
+    storageProvider: { type: String, enum: ["cloudinary", "postgres", "github"], required: true },
     uploadedBy: {
       userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
       name: { type: String, required: true },
