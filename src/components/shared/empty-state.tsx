@@ -27,11 +27,11 @@ export function EmptyState({
         className
       )}
     >
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
-        <Icon className="h-8 w-8 text-muted-foreground" />
+      <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-muted/50">
+        <Icon className="h-6 w-6 text-muted-foreground" />
       </div>
-      <h3 className="mt-4 text-lg font-semibold">{title}</h3>
-      <p className="mt-2 max-w-sm text-sm text-muted-foreground">{description}</p>
+      <h3 className="mt-4 text-base font-semibold">{title}</h3>
+      <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">{description}</p>
       {children && <div className="mt-6">{children}</div>}
     </AnimatedContainer>
   );

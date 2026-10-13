@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Mail, MapPin, Clock, MessageSquare, Send } from "lucide-react";
+import { Mail, Clock, MessageSquare } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { AnimatedContainer, AnimatedItem } from "@/components/shared/animated-container";
 import { ContactForm } from "./ContactForm";
@@ -16,21 +16,18 @@ const contactInfo = [
     title: "Email Us",
     description: "For general inquiries and support",
     value: "vm9678974@gmail.com",
-    gradient: "from-indigo-500 to-violet-500",
   },
   {
     icon: MessageSquare,
     title: "Community",
     description: "Join our student community",
     value: "Discord Server",
-    gradient: "from-violet-500 to-purple-500",
   },
   {
     icon: Clock,
     title: "Response Time",
     description: "We typically respond within",
     value: "24 hours",
-    gradient: "from-emerald-500 to-teal-500",
   },
 ];
 
@@ -38,9 +35,6 @@ export default function ContactPage() {
   return (
     <>
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-0 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-transparent blur-3xl" />
-        </div>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <PageHeader
             title="Contact Us"
@@ -49,28 +43,25 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="pb-20 pt-4">
+      <section className="pb-16 pt-8 md:pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-5">
-            {/* Contact Info */}
+          <div className="grid gap-8 lg:grid-cols-5">
             <div className="lg:col-span-2">
               <AnimatedContainer variant="stagger">
                 <div className="space-y-4">
                   {contactInfo.map((info) => (
                     <AnimatedItem key={info.title}>
-                      <div className="rounded-2xl border border-border/50 bg-card p-5 transition-all hover:shadow-md">
+                      <div className="border-2 border-foreground bg-card p-5 shadow-[4px_4px_0px_0px_currentColor] transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_currentColor]">
                         <div className="flex items-start gap-4">
-                          <div
-                            className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${info.gradient} shadow-md`}
-                          >
-                            <info.icon className="h-5 w-5 text-white" />
+                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border-2 border-foreground bg-foreground text-background">
+                            <info.icon className="h-5 w-5" />
                           </div>
                           <div>
-                            <h3 className="font-semibold">{info.title}</h3>
-                            <p className="text-sm text-muted-foreground">
+                            <h3 className="font-black text-sm uppercase tracking-tight">{info.title}</h3>
+                            <p className="font-mono text-xs text-muted-foreground mt-0.5">
                               {info.description}
                             </p>
-                            <p className="mt-1 text-sm font-medium text-indigo-500">
+                            <p className="mt-1 font-mono text-xs font-bold text-foreground">
                               {info.value}
                             </p>
                           </div>
@@ -82,7 +73,6 @@ export default function ContactPage() {
               </AnimatedContainer>
             </div>
 
-            {/* Contact Form */}
             <div className="lg:col-span-3">
               <AnimatedContainer variant="fadeUp">
                 <ContactForm />

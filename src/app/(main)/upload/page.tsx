@@ -9,10 +9,10 @@ export const metadata = {
 export default function UploadPage() {
   return (
     <ProtectedRoute requireVerified={true}>
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold tracking-tight">Upload Resource</h1>
-          <p className="mt-2 text-muted-foreground">
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:py-12 lg:px-8">
+        <div className="mb-8 text-center border-b-2 border-foreground pb-6">
+          <h1 className="text-3xl font-black uppercase tracking-tight sm:text-4xl">Upload Resource</h1>
+          <p className="mt-2 font-mono text-xs uppercase tracking-wider text-muted-foreground md:text-sm">
             Share your knowledge with juniors. Use our AI scanner for quick uploads!
           </p>
         </div>

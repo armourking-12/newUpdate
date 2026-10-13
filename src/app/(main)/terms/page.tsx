@@ -18,10 +18,10 @@ export default function TermsPage() {
         />
       </div>
 
-      <section className="pb-20 pt-4">
+      <section className="pb-16 pt-8 md:pb-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <AnimatedContainer variant="fadeUp">
-            <div className="prose prose-neutral dark:prose-invert max-w-none rounded-2xl border border-border/50 bg-card p-8 md:p-10">
+            <div className="prose prose-neutral dark:prose-invert max-w-none border-2 border-foreground bg-card p-6 md:p-10 shadow-[6px_6px_0px_0px_currentColor]">
               <h2>1. Acceptance of Terms</h2>
               <p>
                 By accessing and using {APP_NAME}, you agree to be bound by these Terms

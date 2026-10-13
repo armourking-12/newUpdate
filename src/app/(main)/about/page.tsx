@@ -56,23 +56,10 @@ const values = [
   },
 ];
 
-const team = [
-  {
-    name: "HelpJuniors Team",
-    role: "Founders & Developers",
-    description:
-      "A passionate team of student developers who built this platform to solve their own academic challenges.",
-  },
-];
-
 export default function AboutPage() {
   return (
     <>
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/4 top-0 h-[400px] w-[400px] rounded-full bg-gradient-to-br from-indigo-500/10 via-violet-500/10 to-transparent blur-3xl" />
-        </div>
-
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <PageHeader
             title="About HelpJuniors"
@@ -81,19 +68,18 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Story Section */}
-      <section className="py-16 md:py-20">
+      <section className="py-12 md:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <AnimatedContainer variant="fadeUp" className="mx-auto max-w-3xl">
-            <div className="rounded-2xl border border-border/50 bg-card p-8 md:p-10">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-4 py-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400">
+            <div className="border-2 border-foreground bg-card p-6 md:p-8 shadow-[4px_4px_0px_0px_currentColor]">
+              <div className="mb-4 inline-flex items-center gap-2 border border-foreground bg-muted px-3 py-1 font-mono text-xs font-bold uppercase tracking-widest text-foreground">
                 <GraduationCap className="h-3.5 w-3.5" />
                 Our Story
               </div>
-              <h2 className="text-2xl font-bold md:text-3xl">
+              <h2 className="text-xl font-black uppercase tracking-tight md:text-2xl">
                 Born from a Student&apos;s Frustration
               </h2>
-              <div className="mt-6 space-y-4 text-muted-foreground">
+              <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
                 <p>
                   It started during exam season. We spent hours searching WhatsApp groups,
                   Google Drive links, and random websites for previous year question papers.
@@ -115,12 +101,11 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Values */}
-      <section className="border-t border-border/40 bg-muted/30 py-16 md:py-20">
+      <section className="border-t-2 border-foreground bg-muted/20 py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <AnimatedContainer variant="fadeUp" className="text-center">
-            <h2 className="text-3xl font-bold md:text-4xl">Our Values</h2>
-            <p className="mt-4 text-lg text-muted-foreground">
+            <h2 className="text-2xl font-black uppercase tracking-tight sm:text-3xl">Our Values</h2>
+            <p className="mt-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">
               The principles that guide everything we build
             </p>
           </AnimatedContainer>
@@ -129,14 +114,16 @@ export default function AboutPage() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {values.map((value) => (
                 <AnimatedItem key={value.title}>
-                  <div className="rounded-2xl border border-border/50 bg-card p-6 transition-all hover:shadow-lg">
-                    <div className="mb-4 inline-flex rounded-xl bg-indigo-500/10 p-2.5">
-                      <value.icon className="h-5 w-5 text-indigo-500" />
+                  <div className="border-2 border-foreground bg-card p-6 shadow-[4px_4px_0px_0px_currentColor] transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_currentColor] h-full flex flex-col justify-between">
+                    <div>
+                      <div className="mb-4 inline-flex border border-foreground bg-foreground p-2 text-background">
+                        <value.icon className="h-5 w-5" />
+                      </div>
+                      <h3 className="text-base font-black uppercase tracking-tight">{value.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                        {value.description}
+                      </p>
                     </div>
-                    <h3 className="text-lg font-semibold">{value.title}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {value.description}
-                    </p>
                   </div>
                 </AnimatedItem>
               ))}

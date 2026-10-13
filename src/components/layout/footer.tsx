@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { FOOTER_LINKS, APP_NAME } from "@/lib/constants";
 import { Logo } from "./logo";
-import { Globe, MessageCircle, ExternalLink, Heart, Mail } from "lucide-react";
+import { Globe, MessageCircle, Heart, Mail } from "lucide-react";
 
 const socialLinks = [
   { icon: Mail, href: "mailto:vm9678974@gmail.com", label: "Email Support" },
@@ -13,24 +13,23 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border/40 bg-muted/30">
+    <footer className="border-t-2 border-foreground bg-background">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {/* Brand Column */}
-          <div className="lg:col-span-1">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-border">
+          <div className="lg:pr-8">
             <Logo size="md" />
-            <p className="mt-4 max-w-xs text-sm text-muted-foreground">
+            <p className="mt-4 text-xs font-mono leading-relaxed text-muted-foreground">
               Your AI-powered student resource sharing platform. Upload, discover, and
               download academic materials with ease.
             </p>
-            <div className="mt-6 flex items-center gap-3">
+            <div className="mt-6 flex items-center gap-2">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-indigo-500/10 hover:text-indigo-500"
+                  className="flex h-9 w-9 items-center justify-center border-2 border-foreground bg-background text-foreground transition-colors hover:bg-foreground hover:text-background"
                   aria-label={social.label}
                 >
                   <social.icon className="h-4 w-4" />
@@ -39,17 +38,16 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Platform Links */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
+          <div className="lg:pl-8">
+            <h3 className="font-mono text-xs font-black uppercase tracking-widest text-foreground">
               Platform
             </h3>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-4 space-y-2.5">
               {FOOTER_LINKS.platform.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-xs font-mono uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground hover:underline"
                   >
                     {link.label}
                   </Link>
@@ -58,17 +56,16 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Company Links */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
+          <div className="lg:pl-8">
+            <h3 className="font-mono text-xs font-black uppercase tracking-widest text-foreground">
               Company
             </h3>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-4 space-y-2.5">
               {FOOTER_LINKS.company.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-xs font-mono uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground hover:underline"
                   >
                     {link.label}
                   </Link>
@@ -77,17 +74,16 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Legal Links */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
+          <div className="lg:pl-8">
+            <h3 className="font-mono text-xs font-black uppercase tracking-widest text-foreground">
               Legal
             </h3>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-4 space-y-2.5">
               {FOOTER_LINKS.legal.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-xs font-mono uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground hover:underline"
                   >
                     {link.label}
                   </Link>
@@ -97,13 +93,12 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border/40 pt-8 sm:flex-row">
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t-2 border-foreground pt-6 font-mono text-xs text-muted-foreground sm:flex-row">
+          <p>
             &copy; {currentYear} {APP_NAME}. All rights reserved.
           </p>
-          <p className="flex items-center gap-1 text-sm text-muted-foreground">
-            Built with <Heart className="h-3.5 w-3.5 fill-red-500 text-red-500" /> for
+          <p className="flex items-center gap-1.5">
+            Built with <Heart className="h-3.5 w-3.5 fill-current text-foreground" /> for
             students
           </p>
         </div>

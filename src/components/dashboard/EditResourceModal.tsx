@@ -49,46 +49,46 @@ export function EditResourceModal({ resource, onClose }: EditResourceModalProps)
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-      <div className="w-full max-w-2xl rounded-2xl border border-border bg-card p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Edit Resource Details</h2>
-          <button onClick={onClose} className="rounded-full p-2 hover:bg-muted transition-colors">
-            <X className="h-5 w-5 text-muted-foreground" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+      <div className="w-full max-w-xl border-2 border-foreground bg-card p-6 shadow-[6px_6px_0px_0px_currentColor] max-h-[90vh] overflow-y-auto">
+        <div className="mb-5 flex items-center justify-between border-b-2 border-foreground pb-3">
+          <h2 className="text-xl font-black uppercase tracking-tight">Edit Resource Details</h2>
+          <button onClick={onClose} className="border border-foreground p-1 text-muted-foreground hover:bg-foreground hover:text-background transition-colors">
+            <X className="h-4 w-4" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-sm font-medium">Title</label>
+            <label className="text-xs font-mono font-bold uppercase tracking-wider">Title</label>
             <input
               type="text"
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium">Description</label>
+            <label className="text-xs font-mono font-bold uppercase tracking-wider">Description</label>
             <textarea
               required
               rows={3}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-sm font-medium">Type</label>
+              <label className="text-xs font-mono font-bold uppercase tracking-wider">Type</label>
               <select
                 required
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
               >
                 <option value="" disabled>Select type...</option>
                 {RESOURCE_TYPES.map((type) => (
@@ -97,37 +97,37 @@ export function EditResourceModal({ resource, onClose }: EditResourceModalProps)
               </select>
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium">University / College</label>
+              <label className="text-xs font-mono font-bold uppercase tracking-wider">University / College</label>
               <input
                 type="text"
                 required
                 value={formData.university}
                 onChange={(e) => setFormData({ ...formData, university: e.target.value.toUpperCase() })}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 uppercase"
+                className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm uppercase shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium">Course</label>
+              <label className="text-xs font-mono font-bold uppercase tracking-wider">Course</label>
               <input
                 type="text"
                 required
                 value={formData.course}
                 onChange={(e) => setFormData({ ...formData, course: e.target.value })}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium">Subject</label>
+              <label className="text-xs font-mono font-bold uppercase tracking-wider">Subject</label>
               <input
                 type="text"
                 required
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium">Semester (1-8)</label>
+              <label className="text-xs font-mono font-bold uppercase tracking-wider">Semester (1-8)</label>
               <input
                 type="number"
                 min="1"
@@ -135,40 +135,40 @@ export function EditResourceModal({ resource, onClose }: EditResourceModalProps)
                 required
                 value={formData.semester}
                 onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium">Year</label>
+              <label className="text-xs font-mono font-bold uppercase tracking-wider">Year</label>
               <input
                 type="number"
                 required
                 value={formData.year}
                 onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
               />
             </div>
           </div>
 
           {mutation.error && (
-            <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-500">
+            <div className="border-2 border-destructive bg-destructive/10 p-3 font-mono text-xs text-destructive">
               {mutation.error.message}
             </div>
           )}
 
-          <div className="mt-6 flex items-center justify-end gap-3 border-t border-border pt-4">
+          <div className="mt-6 flex items-center justify-end gap-3 border-t-2 border-foreground pt-4">
             <button
               type="button"
               onClick={onClose}
               disabled={mutation.isPending}
-              className="rounded-lg px-4 py-2 text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
+              className="border-2 border-foreground bg-background px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider hover:bg-muted transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={mutation.isPending}
-              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-600 disabled:opacity-50"
+              className="inline-flex items-center gap-2 border-2 border-foreground bg-foreground px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-background shadow-[2px_2px_0px_0px_currentColor] transition-all hover:bg-background hover:text-foreground disabled:opacity-50"
             >
               {mutation.isPending ? (
                 <>

@@ -6,9 +6,9 @@ interface LoadingSpinnerProps {
 }
 
 const sizeMap = {
-  sm: "h-5 w-5 border-2",
-  md: "h-8 w-8 border-[3px]",
-  lg: "h-12 w-12 border-4",
+  sm: "h-4 w-4 border-2",
+  md: "h-6 w-6 border-2",
+  lg: "h-8 w-8 border-2",
 };
 
 export function LoadingSpinner({ size = "md", className }: LoadingSpinnerProps) {
@@ -16,7 +16,7 @@ export function LoadingSpinner({ size = "md", className }: LoadingSpinnerProps) 
     <div className={cn("flex items-center justify-center", className)}>
       <div
         className={cn(
-          "animate-spin rounded-full border-muted-foreground/20 border-t-primary",
+          "animate-spin rounded-full border-muted-foreground/20 border-t-foreground",
           sizeMap[size]
         )}
       />
@@ -27,12 +27,9 @@ export function LoadingSpinner({ size = "md", className }: LoadingSpinnerProps) 
 export function FullPageSpinner() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="relative">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-muted-foreground/20 border-t-primary" />
-          <div className="absolute inset-0 h-12 w-12 animate-spin rounded-full border-4 border-transparent border-b-violet-500" style={{ animationDirection: "reverse", animationDuration: "1.5s" }} />
-        </div>
-        <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-foreground" />
+        <p className="text-sm text-muted-foreground">Loading...</p>
       </div>
     </div>
   );

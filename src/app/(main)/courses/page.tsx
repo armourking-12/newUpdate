@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen, Users, FileText, ArrowRight } from "lucide-react";
+import { BookOpen, FileText, ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { AnimatedContainer, AnimatedItem } from "@/components/shared/animated-container";
 import connectToDatabase from "@/lib/db/mongoose";
@@ -62,9 +62,6 @@ export default async function CoursesPage() {
   return (
     <>
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/3 top-0 h-[400px] w-[400px] rounded-full bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-transparent blur-3xl" />
-        </div>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <PageHeader
             title="Courses"
@@ -73,36 +70,36 @@ export default async function CoursesPage() {
         </div>
       </section>
 
-      <section className="pb-20 pt-4">
+      <section className="pb-16 pt-8 md:pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {courses.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="rounded-full bg-emerald-500/10 p-4 text-emerald-500 mb-4">
-                <BookOpen className="h-8 w-8" />
+            <div className="flex flex-col items-center justify-center border-2 border-dashed border-foreground py-16 text-center">
+              <div className="mb-3 border-2 border-foreground bg-muted p-3 text-foreground">
+                <BookOpen className="h-6 w-6" />
               </div>
-              <h3 className="text-xl font-semibold">No Courses Yet</h3>
-              <p className="mt-2 text-muted-foreground">
+              <h3 className="font-mono text-base font-black uppercase tracking-tight">No Courses Yet</h3>
+              <p className="mt-1 font-mono text-xs text-muted-foreground">
                 Upload resources to see courses populated here!
               </p>
             </div>
           ) : (
             <AnimatedContainer variant="stagger">
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {courses.map((course) => (
                   <AnimatedItem key={course.name}>
                     <Link href={`/resources?course=${encodeURIComponent(course.name)}`} className="block">
-                      <div className="group cursor-pointer rounded-2xl border border-border/50 bg-card p-6 transition-all hover:border-border hover:shadow-lg">
+                      <div className="group cursor-pointer border-2 border-foreground bg-card p-5 shadow-[4px_4px_0px_0px_currentColor] transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_currentColor]">
                         <div className="flex items-start justify-between">
-                          <span className="text-3xl">{course.icon}</span>
-                          <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 transition-all group-hover:translate-x-1 group-hover:text-indigo-500 group-hover:opacity-100" />
+                          <span className="text-2xl">{course.icon}</span>
+                          <ArrowRight className="h-4 w-4 text-foreground opacity-0 transition-opacity group-hover:opacity-100" />
                         </div>
-                        <h3 className="mt-4 font-semibold transition-colors group-hover:text-indigo-500 line-clamp-1">
+                        <h3 className="mt-3 font-black text-base uppercase tracking-tight leading-snug line-clamp-1 group-hover:underline">
                           {course.name}
                         </h3>
-                        <p className="mt-1 text-xs font-medium text-muted-foreground">
+                        <p className="mt-0.5 font-mono text-xs uppercase tracking-wider text-muted-foreground">
                           {course.code}
                         </p>
-                        <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="mt-4 flex items-center gap-4 border-t border-border pt-3 font-mono text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <FileText className="h-3.5 w-3.5" />
                             {course.resources.toLocaleString()} resources

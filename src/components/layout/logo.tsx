@@ -10,9 +10,9 @@ interface LogoProps {
 }
 
 const sizeConfig = {
-  sm: { container: "w-6 h-6", text: "text-lg" },
-  md: { container: "w-8 h-8", text: "text-xl" },
-  lg: { container: "w-10 h-10", text: "text-2xl" },
+  sm: { container: "w-5 h-5", text: "text-base" },
+  md: { container: "w-7 h-7", text: "text-lg" },
+  lg: { container: "w-9 h-9", text: "text-xl" },
 };
 
 export function Logo({ size = "md", className, showText = true }: LogoProps) {
@@ -21,24 +21,26 @@ export function Logo({ size = "md", className, showText = true }: LogoProps) {
   return (
     <Link
       href={ROUTES.home}
-      className={cn("group flex items-center gap-2 transition-opacity hover:opacity-80", className)}
+      className={cn("group inline-flex items-center gap-2.5 transition-opacity hover:opacity-80", className)}
     >
-      <div className={cn("relative flex items-center justify-center transition-transform group-hover:scale-105", config.container)}>
+      <div className={cn("relative flex items-center justify-center border-2 border-foreground bg-background p-1", config.container)}>
         <Image 
           src="/icons.png" 
           alt="HelpJuniors Logo" 
           fill
           sizes="(max-width: 768px) 40px, 40px"
-          className="object-contain drop-shadow-sm"
+          className="object-contain p-0.5"
           priority
         />
       </div>
       {showText && (
-        <span className={cn(config.text, "font-bold tracking-tight")}>
-          <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 bg-clip-text text-transparent">
+        <span className={cn(config.text, "font-black tracking-tight inline-flex items-center gap-1 select-none")}>
+          <span className="bg-foreground text-background px-1.5 py-0.5 font-mono text-xs uppercase tracking-wider">
             Help
           </span>
-          <span className="text-foreground">Juniors</span>
+          <span className="text-foreground tracking-tight font-extrabold">
+            Juniors
+          </span>
         </span>
       )}
     </Link>

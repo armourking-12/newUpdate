@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Search, LogOut, LayoutDashboard, User, UploadCloud } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { Menu, X, Search, LayoutDashboard, UploadCloud } from "lucide-react";
+import { AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 import { NAV_LINKS, ROUTES } from "@/lib/constants";
 import { Logo } from "./logo";
@@ -16,22 +16,15 @@ import { UserButton, SignInButton } from "@clerk/nextjs";
 export function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, profile, isClerkLoaded, logout } = useAuth();
+  const { user, isClerkLoaded } = useAuth();
 
   return (
     <>
-      <motion.header
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 200, damping: 30 }}
-        className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60"
-      >
+      <header className="sticky top-0 z-50 w-full border-b-2 border-foreground bg-background">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* Logo */}
           <Logo />
 
-          {/* Desktop Nav */}
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="hidden items-center md:flex divide-x border-x border-border">
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href;
               return (
@@ -39,30 +32,22 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "relative rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    "px-3.5 py-2 text-xs font-mono uppercase tracking-wider transition-colors",
                     isActive
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-foreground text-background font-bold"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   {link.label}
-                  {isActive && (
-                    <motion.div
-                      layoutId="navbar-indicator"
-                      className="absolute inset-x-0 -bottom-[1.07rem] h-[2px] bg-gradient-to-r from-indigo-500 to-violet-500"
-                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                    />
-                  )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Right Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <Link
               href={ROUTES.resources}
-              className="hidden rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:flex"
+              className="hidden p-2 text-foreground border border-border transition-colors hover:bg-foreground hover:text-background sm:flex"
               aria-label="Search resources"
             >
               <Search className="h-4 w-4" />
@@ -70,31 +55,30 @@ export function Navbar() {
 
             <ThemeToggle />
 
-            {/* Auth-dependent buttons */}
             {isClerkLoaded && (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 <Link
                   href={ROUTES.upload}
-                  className="hidden items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-600 transition-colors hover:bg-emerald-500/20 dark:text-emerald-400 sm:flex"
+                  className="hidden items-center gap-1.5 border-2 border-foreground bg-background px-3 py-1.5 text-xs font-mono uppercase tracking-wider font-bold text-foreground transition-colors hover:bg-foreground hover:text-background sm:flex"
                 >
-                  <UploadCloud className="h-4 w-4" />
+                  <UploadCloud className="h-3.5 w-3.5" />
                   Upload
                 </Link>
 
                 {user ? (
-                  <div className="hidden items-center gap-4 sm:flex">
+                  <div className="hidden items-center gap-2 sm:flex">
                     <Link
                       href={ROUTES.dashboard}
-                      className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                      className="inline-flex items-center gap-1.5 border-2 border-foreground bg-background px-3 py-1.5 text-xs font-mono uppercase tracking-wider font-bold text-foreground transition-colors hover:bg-foreground hover:text-background"
                     >
-                      <LayoutDashboard className="h-4 w-4" />
+                      <LayoutDashboard className="h-3.5 w-3.5" />
                       Dashboard
                     </Link>
-                    <UserButton appearance={{ elements: { userButtonAvatarBox: "h-9 w-9" } }} />
+                    <UserButton appearance={{ elements: { userButtonAvatarBox: "h-8 w-8 rounded-none border border-foreground" } }} />
                   </div>
                 ) : (
                   <SignInButton mode="modal">
-                    <button className="hidden rounded-lg bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/30 hover:brightness-110 sm:inline-flex">
+                    <button className="hidden border-2 border-foreground bg-foreground px-4 py-1.5 text-xs font-mono uppercase tracking-wider font-bold text-background transition-colors hover:bg-background hover:text-foreground sm:inline-flex">
                       Sign In
                     </button>
                   </SignInButton>
@@ -102,19 +86,17 @@ export function Navbar() {
               </div>
             )}
 
-            {/* Mobile menu button */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="inline-flex rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
+              className="inline-flex border-2 border-foreground p-1.5 text-foreground transition-colors hover:bg-foreground hover:text-background md:hidden"
               aria-label="Toggle menu"
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
-      </motion.header>
+      </header>
 
-      {/* Mobile Navigation */}
       <AnimatePresence>
         {mobileOpen && <MobileNav onClose={() => setMobileOpen(false)} />}
       </AnimatePresence>
