@@ -14,18 +14,18 @@ export function PageHeader({ title, description, className, children }: PageHead
   return (
     <AnimatedContainer
       variant="fadeUp"
-      className={cn("py-12 md:py-16 lg:py-20", className)}
+      className={cn("border-b-2 border-foreground py-8 md:py-12", className)}
     >
       <div className="mx-auto max-w-4xl text-center">
-        <h1 className="bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-4xl font-bold tracking-tight text-transparent md:text-5xl lg:text-6xl">
+        <h1 className="text-3xl font-black uppercase tracking-tight text-foreground sm:text-4xl md:text-5xl">
           {title}
         </h1>
         {description && (
-          <p className="mt-4 text-lg text-muted-foreground md:text-xl">
+          <p className="mx-auto mt-3 max-w-2xl font-mono text-xs uppercase tracking-wide text-muted-foreground md:text-sm">
             {description}
           </p>
         )}
-        {children && <div className="mt-8">{children}</div>}
+        {children && <div className="mt-6">{children}</div>}
       </div>
     </AnimatedContainer>
   );

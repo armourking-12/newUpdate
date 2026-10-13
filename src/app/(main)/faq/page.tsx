@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import type { Metadata } from "next";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -74,14 +73,14 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-border/30 last:border-b-0">
+    <div className="border-b-2 border-foreground last:border-b-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left transition-colors hover:bg-muted/50"
+        className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left font-bold text-sm uppercase tracking-tight transition-colors hover:bg-muted"
       >
-        <span className="font-medium">{question}</span>
+        <span>{question}</span>
         <ChevronDown
-          className={`h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`h-4 w-4 flex-shrink-0 text-foreground transition-transform duration-150 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
       <AnimatePresence>
@@ -90,10 +89,10 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
+            transition={{ duration: 0.15 }}
+            className="overflow-hidden bg-muted/30"
           >
-            <p className="px-6 pb-4 text-sm leading-relaxed text-muted-foreground">
+            <p className="px-5 pb-5 pt-2 text-sm leading-relaxed text-muted-foreground border-t border-border">
               {answer}
             </p>
           </motion.div>
@@ -107,9 +106,6 @@ export default function FAQPage() {
   return (
     <>
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-0 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-transparent blur-3xl" />
-        </div>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <PageHeader
             title="Frequently Asked Questions"
@@ -118,28 +114,27 @@ export default function FAQPage() {
         </div>
       </section>
 
-      {/* FAQ Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            "mainEntity": faqs.flatMap(section => 
+            mainEntity: faqs.flatMap(section => 
               section.questions.map(q => ({
                 "@type": "Question",
-                "name": q.q,
-                "acceptedAnswer": {
+                name: q.q,
+                acceptedAnswer: {
                   "@type": "Answer",
-                  "text": q.a
-                }
+                  text: q.a,
+                },
               }))
-            )
-          })
+            ),
+          }),
         }}
       />
 
-      <section className="pb-20 pt-4">
+      <section className="pb-16 pt-8 md:pb-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <AnimatedContainer variant="stagger">
             <div className="space-y-8">
@@ -147,10 +142,10 @@ export default function FAQPage() {
                 <AnimatedItem key={section.category}>
                   <div>
                     <div className="mb-3 flex items-center gap-2">
-                      <HelpCircle className="h-4 w-4 text-indigo-500" />
-                      <h2 className="text-lg font-semibold">{section.category}</h2>
+                      <HelpCircle className="h-4 w-4 text-foreground" />
+                      <h2 className="font-mono text-xs font-black uppercase tracking-widest text-foreground">{section.category}</h2>
                     </div>
-                    <div className="overflow-hidden rounded-2xl border border-border/50 bg-card">
+                    <div className="border-2 border-foreground bg-card shadow-[4px_4px_0px_0px_currentColor]">
                       {section.questions.map((faq) => (
                         <FAQItem
                           key={faq.q}

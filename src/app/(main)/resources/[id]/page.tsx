@@ -49,7 +49,6 @@ export default async function ResourceDetailsPage({ params }: { params: Promise<
     notFound();
   }
 
-  // Calculate hasLiked and hasSaved for the current user server-side
   const { userId: clerkId } = await auth();
   let currentUser: any = null;
   let hasLiked = false;
@@ -63,7 +62,6 @@ export default async function ResourceDetailsPage({ params }: { params: Promise<
     }
   }
 
-  // Strip internal arrays before passing to client
   const { likes, viewedBy, ...safeResource } = resource;
 
   const initialResource = {
@@ -82,7 +80,6 @@ export default async function ResourceDetailsPage({ params }: { params: Promise<
 
   return (
     <>
-      {/* Breadcrumb Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -112,7 +109,6 @@ export default async function ResourceDetailsPage({ params }: { params: Promise<
           })
         }}
       />
-      {/* Article Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -131,16 +127,16 @@ export default async function ResourceDetailsPage({ params }: { params: Promise<
         }}
       />
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <Link 
-        href="/resources"
-        className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-indigo-500"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Resources
-      </Link>
+        <Link 
+          href="/resources"
+          className="inline-flex items-center gap-2 border-2 border-foreground bg-background px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-foreground transition-all shadow-[2px_2px_0px_0px_currentColor] hover:bg-muted mb-8"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Resources
+        </Link>
 
-      <ResourceDetailsClient initialResource={JSON.parse(JSON.stringify(initialResource))} />
-    </div>
+        <ResourceDetailsClient initialResource={JSON.parse(JSON.stringify(initialResource))} />
+      </div>
     </>
   );
 }

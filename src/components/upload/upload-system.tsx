@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
@@ -26,26 +26,23 @@ import { RESOURCE_TYPES, EXAM_TYPES } from "@/lib/constants";
 type UploadStep = "selection" | "file_preview" | "ai_processing" | "form" | "success";
 type UploadMode = "document" | "capture";
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+const MAX_FILE_SIZE = 25 * 1024 * 1024;
 
 export function UploadSystem() {
   const router = useRouter();
   const { profile } = useAuth();
   const queryClient = useQueryClient();
 
-  // State
   const [step, setStep] = useState<UploadStep>("selection");
   const [mode, setMode] = useState<UploadMode | null>(null);
   const [file, setFile] = useState<File | null>(null);
   
-  // Progress & Errors
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
   const [similarWarning, setSimilarWarning] = useState<string | null>(null);
   const [ignoreSimilar, setIgnoreSimilar] = useState(false);
 
-  // Form
   const {
     register,
     handleSubmit,
@@ -55,10 +52,6 @@ export function UploadSystem() {
   } = useForm<UploadFormData>({
     resolver: zodResolver(uploadSchema),
   });
-
-  // ---------------------------------------------------------------------------
-  // Core Functions
-  // ---------------------------------------------------------------------------
 
   const checkHashCollision = async (hash: string): Promise<boolean> => {
     try {
@@ -85,7 +78,6 @@ export function UploadSystem() {
       setStep("ai_processing");
       await extractDataWithGemini(selectedFile);
     } else {
-      // Direct to form for DOCX/PPTX
       setStep("form");
     }
   };
@@ -93,7 +85,6 @@ export function UploadSystem() {
   const extractDataWithGemini = async (documentFile: File) => {
     setIsProcessing(true);
     try {
-      // Convert file to Base64
       const reader = new FileReader();
       const base64Promise = new Promise<string>((resolve, reject) => {
         reader.onload = () => resolve(reader.result as string);
@@ -105,7 +96,6 @@ export function UploadSystem() {
       let result = null;
       let lastError = null;
 
-      // Retry mechanism (up to 2 times)
       for (let attempt = 1; attempt <= 2; attempt++) {
         try {
           const response = await fetch("/api/ai/extract", {
@@ -120,7 +110,7 @@ export function UploadSystem() {
           if (!response.ok) throw new Error(`AI Extraction failed on attempt ${attempt}`);
 
           result = await response.json();
-          break; // Success, exit retry loop
+          break;
         } catch (err) {
           lastError = err;
           console.warn(`Extraction attempt ${attempt} failed.`);
@@ -132,7 +122,6 @@ export function UploadSystem() {
 
       const data = result.data;
 
-      // Auto-fill form
       if (data.title) setValue("title", data.title);
       if (data.description) setValue("description", data.description);
       if (data.university) setValue("university", data.university);
@@ -149,7 +138,7 @@ export function UploadSystem() {
       }
 
       if (data.tags) setValue("tags", data.tags);
-      setValue("type", "PYQ"); // Default
+      setValue("type", "PYQ");
 
     } catch (err) {
       console.error(err);
@@ -210,10 +199,6 @@ export function UploadSystem() {
     }
   };
 
-  // ---------------------------------------------------------------------------
-  // File Drop Handlers
-  // ---------------------------------------------------------------------------
-
   const handleFileDrop = async (selectedFile: File, selectedMode: UploadMode) => {
     if (selectedFile.size > MAX_FILE_SIZE) {
       setError("File is too large. Maximum size is 25MB.");
@@ -228,12 +213,10 @@ export function UploadSystem() {
     setSimilarWarning(null);
     setIgnoreSimilar(false);
 
-    // Hash file in background to check exact duplicates
     try {
       const hash = await generateFileHash(selectedFile);
       const isDuplicate = await checkHashCollision(hash);
       
-      // If it's a capture, immediately proceed to AI after checking duplicate
       if (selectedMode === "capture") {
         if (!isDuplicate) {
           await processFileForAI(selectedFile);
@@ -275,55 +258,48 @@ export function UploadSystem() {
     reset();
   };
 
-  // ---------------------------------------------------------------------------
-  // Render
-  // ---------------------------------------------------------------------------
-
   return (
     <div className="relative">
       <AnimatePresence mode="wait">
-        
-        {/* STEP 1: SELECTION MODE */}
         {step === "selection" && (
           <motion.div
             key="selection"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             className="grid gap-6 md:grid-cols-2"
           >
-            {/* Option 1: Document Upload */}
             <div
               {...getDocRootProps()}
-              className={`group relative flex cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed p-10 text-center transition-all ${isDocDragActive ? "border-indigo-500 bg-indigo-500/10" : "border-border hover:border-indigo-500/50 hover:bg-muted/50"}`}
+              className={`flex cursor-pointer flex-col items-center justify-center gap-3 border-2 border-dashed p-8 text-center shadow-[4px_4px_0px_0px_currentColor] transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_currentColor] ${isDocDragActive ? "border-foreground bg-muted" : "border-foreground bg-card hover:bg-muted/40"}`}
             >
               <input {...getDocInputProps()} />
-              <div className="rounded-full bg-indigo-500/10 p-4 text-indigo-500 transition-transform group-hover:scale-110">
-                <UploadCloud className="h-8 w-8" />
+              <div className="border-2 border-foreground bg-foreground p-3 text-background">
+                <UploadCloud className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold">Upload Document</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <h3 className="font-black text-base uppercase tracking-tight">Upload Document</h3>
+                <p className="mt-1 font-mono text-xs text-muted-foreground">
                   Drag & drop your PDF, DOCX, PPTX, or image files here.
                 </p>
               </div>
             </div>
 
-            {/* Option 2: Capture Paper */}
             <div
               {...getCaptureRootProps()}
-              className={`group relative flex cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed p-10 text-center transition-all ${isCaptureDragActive ? "border-emerald-500 bg-emerald-500/10" : "border-border hover:border-emerald-500/50 hover:bg-muted/50"}`}
+              className={`relative flex cursor-pointer flex-col items-center justify-center gap-3 border-2 border-dashed p-8 text-center shadow-[4px_4px_0px_0px_currentColor] transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_currentColor] ${isCaptureDragActive ? "border-foreground bg-muted" : "border-foreground bg-card hover:bg-muted/40"}`}
             >
               <input {...getCaptureInputProps()} capture="environment" />
-              <div className="absolute right-4 top-4 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-medium text-emerald-500">
+              <div className="absolute right-3.5 top-3.5 border border-foreground bg-foreground px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-background">
                 AI Powered ✨
               </div>
-              <div className="rounded-full bg-emerald-500/10 p-4 text-emerald-500 transition-transform group-hover:scale-110">
-                <Camera className="h-8 w-8" />
+              <div className="border-2 border-foreground bg-foreground p-3 text-background">
+                <Camera className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold">Capture Paper</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <h3 className="font-black text-base uppercase tracking-tight">Capture Paper</h3>
+                <p className="mt-1 font-mono text-xs text-muted-foreground">
                   Take a photo of an exam paper. We&apos;ll extract the details automatically.
                 </p>
               </div>
@@ -331,46 +307,47 @@ export function UploadSystem() {
           </motion.div>
         )}
 
-        {/* STEP 2: FILE PREVIEW (Mainly for Document Mode) */}
         {step === "file_preview" && file && (
           <motion.div
             key="file_preview"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mx-auto max-w-lg rounded-2xl border border-border bg-card p-6 shadow-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="mx-auto max-w-lg border-2 border-foreground bg-card p-6 shadow-[4px_4px_0px_0px_currentColor]"
           >
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="rounded-lg bg-indigo-500/10 p-3 text-indigo-500">
-                  <FileText className="h-6 w-6" />
+            <div className="flex items-start justify-between border-b border-border pb-4">
+              <div className="flex items-center gap-3.5">
+                <div className="border-2 border-foreground bg-foreground p-2 text-background">
+                  <FileText className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="font-medium line-clamp-1">{file.name}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-bold text-sm uppercase tracking-tight line-clamp-1">{file.name}</p>
+                  <p className="font-mono text-xs text-muted-foreground">
                     {(file.size / 1024 / 1024).toFixed(2)} MB
                   </p>
                 </div>
               </div>
-              <button onClick={cancelUpload} className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
-                <X className="h-5 w-5" />
+              <button onClick={cancelUpload} className="border border-foreground p-1 text-muted-foreground hover:bg-foreground hover:text-background transition-colors">
+                <X className="h-4 w-4" />
               </button>
             </div>
 
             {duplicateWarning && (
-              <div className="mt-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive flex items-start gap-2">
+              <div className="mt-4 border-2 border-destructive bg-destructive/10 p-3 font-mono text-xs text-destructive flex items-start gap-2">
                 <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
                 <p>{duplicateWarning}</p>
               </div>
             )}
 
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={cancelUpload} className="rounded-lg px-4 py-2 text-sm font-medium hover:bg-muted">
+              <button onClick={cancelUpload} className="border-2 border-foreground bg-background px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider hover:bg-muted transition-colors">
                 Cancel
               </button>
               <button
                 onClick={() => processFileForAI(file)}
                 disabled={!!duplicateWarning}
-                className="rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-600 disabled:opacity-50"
+                className="border-2 border-foreground bg-foreground px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-background shadow-[2px_2px_0px_0px_currentColor] transition-all hover:bg-background hover:text-foreground disabled:opacity-50"
               >
                 Continue to Details
               </button>
@@ -378,69 +355,68 @@ export function UploadSystem() {
           </motion.div>
         )}
 
-        {/* STEP 3: AI PROCESSING */}
         {step === "ai_processing" && (
           <motion.div
             key="ai_processing"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center py-12 text-center"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col items-center justify-center border-2 border-foreground bg-card py-16 px-6 text-center shadow-[4px_4px_0px_0px_currentColor]"
           >
-            <div className="relative mb-6">
-              <div className="absolute inset-0 animate-ping rounded-full bg-emerald-500/20" />
-              <div className="relative rounded-full bg-emerald-500/20 p-4 text-emerald-500">
-                <Loader2 className="h-8 w-8 animate-spin" />
-              </div>
+            <div className="mb-4 border-2 border-foreground bg-foreground p-3 text-background">
+              <Loader2 className="h-6 w-6 animate-spin" />
             </div>
-            <h3 className="text-lg font-medium">Analyzing Document with AI...</h3>
-            <p className="mt-2 text-sm text-muted-foreground max-w-sm">
+            <h3 className="font-black text-lg uppercase tracking-tight">Analyzing Document with AI...</h3>
+            <p className="mt-2 font-mono text-xs uppercase tracking-wider text-muted-foreground max-w-sm">
               Extracting university, course, subject, and other academic details to save you time.
             </p>
           </motion.div>
         )}
 
-        {/* STEP 4: METADATA FORM */}
         {step === "form" && (
           <motion.div
             key="form"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl border border-border bg-card p-6 shadow-xl sm:p-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="border-2 border-foreground bg-card p-6 sm:p-8 shadow-[4px_4px_0px_0px_currentColor]"
           >
-            <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
+            <div className="mb-6 flex items-center justify-between border-b-2 border-foreground pb-4">
               <div>
-                <h2 className="text-xl font-semibold">Resource Details</h2>
-                <p className="text-sm text-muted-foreground">
+                <h2 className="text-xl font-black uppercase tracking-tight">Resource Details</h2>
+                <p className="font-mono text-xs text-muted-foreground mt-0.5">
                   {mode === "capture" || isProcessing
                     ? "Please review and edit the AI-extracted details below." 
                     : "Fill in the details to help others find your resource."}
                 </p>
               </div>
-              <button onClick={cancelUpload} disabled={isSubmitting} className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground">
-                <X className="h-5 w-5" />
+              <button onClick={cancelUpload} disabled={isSubmitting} className="border border-foreground p-1 text-muted-foreground hover:bg-foreground hover:text-background transition-colors">
+                <X className="h-4 w-4" />
               </button>
             </div>
 
             {error && (
-              <div className="mb-6 rounded-lg bg-destructive/10 p-3 text-sm text-destructive flex items-center gap-2">
+              <div className="mb-6 border-2 border-destructive bg-destructive/10 p-3 font-mono text-xs text-destructive flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
                 {error}
               </div>
             )}
 
             {similarWarning && (
-              <div className="mb-6 rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 text-sm text-amber-600 dark:text-amber-400">
+              <div className="mb-6 border-2 border-foreground bg-amber-500/10 p-4 font-mono text-xs text-foreground">
                 <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5 flex-shrink-0" />
+                  <AlertTriangle className="h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
                   <div>
-                    <p className="font-semibold">Possible Duplicate Detected</p>
+                    <p className="font-bold uppercase tracking-wider">Possible Duplicate Detected</p>
                     <p className="mt-1">{similarWarning}</p>
-                    <label className="mt-3 flex items-center gap-2 cursor-pointer font-medium">
+                    <label className="mt-3 flex items-center gap-2 cursor-pointer font-bold uppercase tracking-wider">
                       <input 
                         type="checkbox" 
                         checked={ignoreSimilar}
                         onChange={(e) => setIgnoreSimilar(e.target.checked)}
-                        className="rounded border-amber-500 text-amber-500 focus:ring-amber-500" 
+                        className="border-2 border-foreground text-foreground focus:ring-0" 
                       />
                       I confirm this is a unique resource. Ignore warning.
                     </label>
@@ -449,139 +425,129 @@ export function UploadSystem() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                {/* Title */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div className="md:col-span-2">
-                  <label className="mb-1.5 block text-sm font-medium">Title <span className="text-destructive">*</span></label>
+                  <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider">Title <span className="text-destructive">*</span></label>
                   <input
                     {...register("title")}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none placeholder:text-muted-foreground"
                     placeholder="e.g. Data Structures Mid-Term 2023"
                   />
-                  {errors.title && <p className="mt-1 text-xs text-destructive">{errors.title.message}</p>}
+                  {errors.title && <p className="mt-1 font-mono text-xs text-destructive">{errors.title.message}</p>}
                 </div>
 
-                {/* Description */}
                 <div className="md:col-span-2">
-                  <label className="mb-1.5 block text-sm font-medium">Description <span className="text-destructive">*</span></label>
+                  <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider">Description <span className="text-destructive">*</span></label>
                   <textarea
                     {...register("description")}
                     rows={3}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none placeholder:text-muted-foreground"
                     placeholder="Briefly describe what this resource contains..."
                   />
-                  {errors.description && <p className="mt-1 text-xs text-destructive">{errors.description.message}</p>}
+                  {errors.description && <p className="mt-1 font-mono text-xs text-destructive">{errors.description.message}</p>}
                 </div>
 
-                {/* Type */}
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium">Resource Type <span className="text-destructive">*</span></label>
+                  <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider">Resource Type <span className="text-destructive">*</span></label>
                   <select
                     {...register("type")}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
                   >
                     <option value="">Select type...</option>
                     {RESOURCE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
-                  {errors.type && <p className="mt-1 text-xs text-destructive">{errors.type.message}</p>}
+                  {errors.type && <p className="mt-1 font-mono text-xs text-destructive">{errors.type.message}</p>}
                 </div>
 
-                {/* University */}
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium">University <span className="text-destructive">*</span></label>
+                  <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider">University <span className="text-destructive">*</span></label>
                   <input
                     {...register("university")}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none placeholder:text-muted-foreground"
                     placeholder="e.g. MIT, Stanford, Delhi University"
                   />
-                  {errors.university && <p className="mt-1 text-xs text-destructive">{errors.university.message}</p>}
+                  {errors.university && <p className="mt-1 font-mono text-xs text-destructive">{errors.university.message}</p>}
                 </div>
 
-                {/* Course */}
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium">Course/Degree <span className="text-destructive">*</span></label>
+                  <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider">Course/Degree <span className="text-destructive">*</span></label>
                   <input
                     {...register("course")}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none placeholder:text-muted-foreground"
                     placeholder="e.g. B.Tech Computer Science"
                   />
-                  {errors.course && <p className="mt-1 text-xs text-destructive">{errors.course.message}</p>}
+                  {errors.course && <p className="mt-1 font-mono text-xs text-destructive">{errors.course.message}</p>}
                 </div>
 
-                {/* Subject */}
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium">Subject <span className="text-destructive">*</span></label>
+                  <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider">Subject <span className="text-destructive">*</span></label>
                   <input
                     {...register("subject")}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none placeholder:text-muted-foreground"
                     placeholder="e.g. Data Structures"
                   />
-                  {errors.subject && <p className="mt-1 text-xs text-destructive">{errors.subject.message}</p>}
+                  {errors.subject && <p className="mt-1 font-mono text-xs text-destructive">{errors.subject.message}</p>}
                 </div>
 
-                {/* Semester & Year */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium">Semester <span className="text-destructive">*</span></label>
+                    <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider">Semester <span className="text-destructive">*</span></label>
                     <input
                       type="number"
                       {...register("semester", { valueAsNumber: true })}
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
                       min={1} max={8}
                     />
-                    {errors.semester && <p className="mt-1 text-xs text-destructive">{errors.semester.message}</p>}
+                    {errors.semester && <p className="mt-1 font-mono text-xs text-destructive">{errors.semester.message}</p>}
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium">Year <span className="text-destructive">*</span></label>
+                    <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider">Year <span className="text-destructive">*</span></label>
                     <input
                       type="number"
                       {...register("year", { valueAsNumber: true })}
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
                       min={2000} max={new Date().getFullYear()}
                     />
-                    {errors.year && <p className="mt-1 text-xs text-destructive">{errors.year.message}</p>}
+                    {errors.year && <p className="mt-1 font-mono text-xs text-destructive">{errors.year.message}</p>}
                   </div>
                 </div>
 
-                {/* Exam Type (Optional) */}
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium">Exam Type <span className="text-muted-foreground font-normal">(Optional)</span></label>
+                  <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider">Exam Type <span className="text-muted-foreground font-normal">(Optional)</span></label>
                   <select
                     {...register("examType")}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none"
                   >
                     <option value="">Select if applicable...</option>
                     {EXAM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
 
-                {/* Tags */}
                 <div className="md:col-span-2">
-                  <label className="mb-1.5 block text-sm font-medium">Tags <span className="text-muted-foreground font-normal">(Comma separated)</span></label>
+                  <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider">Tags <span className="text-muted-foreground font-normal">(Comma separated)</span></label>
                   <input
                     {...register("tags")}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm shadow-[2px_2px_0px_0px_currentColor] focus:outline-none placeholder:text-muted-foreground"
                     placeholder="e.g. algorithms, trees, important"
                   />
-                  {errors.tags && <p className="mt-1 text-xs text-destructive">{errors.tags.message}</p>}
+                  {errors.tags && <p className="mt-1 font-mono text-xs text-destructive">{errors.tags.message}</p>}
                 </div>
               </div>
 
-              {/* Submit Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-border">
+              <div className="flex justify-end gap-3 pt-6 border-t-2 border-foreground">
                 <button
                   type="button"
                   onClick={cancelUpload}
                   disabled={isSubmitting}
-                  className="rounded-lg px-4 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50"
+                  className="border-2 border-foreground bg-background px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider hover:bg-muted transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting || (!!similarWarning && !ignoreSimilar)}
-                  className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-600 disabled:opacity-50"
+                  className="inline-flex items-center gap-2 border-2 border-foreground bg-foreground px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-background shadow-[3px_3px_0px_0px_currentColor] transition-all hover:bg-background hover:text-foreground disabled:opacity-50"
                 >
                   {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
                   {isSubmitting ? "Uploading..." : "Submit for Approval"}
@@ -591,38 +557,38 @@ export function UploadSystem() {
           </motion.div>
         )}
 
-        {/* STEP 5: SUCCESS */}
         {step === "success" && (
           <motion.div
             key="success"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-12 text-center shadow-xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col items-center justify-center border-2 border-foreground bg-card p-10 text-center shadow-[4px_4px_0px_0px_currentColor]"
           >
-            <div className="mb-6 rounded-full bg-emerald-500/10 p-4 text-emerald-500">
-              <CheckCircle2 className="h-12 w-12" />
+            <div className="mb-4 border-2 border-foreground bg-foreground p-3 text-background">
+              <CheckCircle2 className="h-8 w-8" />
             </div>
-            <h2 className="text-2xl font-bold">Upload Successful!</h2>
-            <p className="mt-2 max-w-md text-muted-foreground">
+            <h2 className="text-2xl font-black uppercase tracking-tight">Upload Successful!</h2>
+            <p className="mt-2 max-w-md font-mono text-xs uppercase tracking-wider text-muted-foreground">
               Thank you for contributing! Your resource has been instantly approved and is now publicly visible on the Resources page.
             </p>
-            <div className="mt-8 flex gap-4">
+            <div className="mt-6 flex gap-3">
               <button
                 onClick={cancelUpload}
-                className="rounded-lg border border-border bg-background px-6 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                className="border-2 border-foreground bg-background px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider transition-colors hover:bg-muted"
               >
                 Upload Another
               </button>
               <button
                 onClick={() => router.push("/dashboard")}
-                className="rounded-lg bg-indigo-500 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-600"
+                className="border-2 border-foreground bg-foreground px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-background shadow-[2px_2px_0px_0px_currentColor] transition-all hover:bg-background hover:text-foreground"
               >
                 Back to Dashboard
               </button>
             </div>
           </motion.div>
         )}
-
       </AnimatePresence>
     </div>
   );

@@ -6,40 +6,40 @@ import { cn } from "@/lib/utils";
 const containerVariants: Record<string, Variants> = {
   fadeIn: {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.5 } },
+    visible: { opacity: 1, transition: { duration: 0.15 } },
   },
   fadeUp: {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    hidden: { opacity: 0, y: 4 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.15, ease: "easeOut" } },
   },
   fadeDown: {
-    hidden: { opacity: 0, y: -20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    hidden: { opacity: 0, y: -4 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.15, ease: "easeOut" } },
   },
   fadeLeft: {
-    hidden: { opacity: 0, x: -30 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    hidden: { opacity: 0, x: -4 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.15, ease: "easeOut" } },
   },
   fadeRight: {
-    hidden: { opacity: 0, x: 30 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    hidden: { opacity: 0, x: 4 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.15, ease: "easeOut" } },
   },
   scaleIn: {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.15, ease: "easeOut" } },
   },
   stagger: {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 },
+      transition: { staggerChildren: 0.03 },
     },
   },
 };
 
 const childVariants: Variants = {
-  hidden: { opacity: 0, y: 15 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.15, ease: "easeOut" } },
 };
 
 const motionComponents = {
@@ -75,9 +75,9 @@ export function AnimatedContainer({
       variants={variants}
       initial="hidden"
       {...(viewport
-        ? { whileInView: "visible", viewport: { once: true, margin: "-50px" } }
+        ? { whileInView: "visible", viewport: { once: true, margin: "-20px" } }
         : { animate: "visible" })}
-      transition={{ delay }}
+      transition={{ delay: Math.min(delay, 0.05) }}
       className={cn(className)}
     >
       {children}
@@ -85,7 +85,6 @@ export function AnimatedContainer({
   );
 }
 
-/** Wrapper for stagger children animations */
 export function AnimatedItem({
   children,
   className,

@@ -18,7 +18,6 @@ const posts = [
     category: "Study Tips",
     readTime: "5 min read",
     date: "June 15, 2026",
-    gradient: "from-indigo-500 to-violet-500",
   },
   {
     id: "2",
@@ -28,7 +27,6 @@ const posts = [
     category: "Product Update",
     readTime: "3 min read",
     date: "June 10, 2026",
-    gradient: "from-violet-500 to-purple-500",
   },
   {
     id: "3",
@@ -38,7 +36,6 @@ const posts = [
     category: "Study Tips",
     readTime: "7 min read",
     date: "June 5, 2026",
-    gradient: "from-emerald-500 to-teal-500",
   },
   {
     id: "4",
@@ -48,7 +45,6 @@ const posts = [
     category: "Behind the Scenes",
     readTime: "4 min read",
     date: "May 28, 2026",
-    gradient: "from-amber-500 to-orange-500",
   },
   {
     id: "5",
@@ -58,7 +54,6 @@ const posts = [
     category: "Study Tips",
     readTime: "6 min read",
     date: "May 20, 2026",
-    gradient: "from-rose-500 to-pink-500",
   },
   {
     id: "6",
@@ -68,7 +63,6 @@ const posts = [
     category: "Community",
     readTime: "4 min read",
     date: "May 15, 2026",
-    gradient: "from-cyan-500 to-blue-500",
   },
 ];
 
@@ -76,9 +70,6 @@ export default function BlogPage() {
   return (
     <>
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-0 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-gradient-to-br from-rose-500/10 via-pink-500/10 to-transparent blur-3xl" />
-        </div>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <PageHeader
             title="Blog"
@@ -87,42 +78,40 @@ export default function BlogPage() {
         </div>
       </section>
 
-      <section className="pb-20 pt-4">
+      <section className="pb-16 pt-8 md:pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <AnimatedContainer variant="stagger">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {posts.map((post) => (
                 <AnimatedItem key={post.id}>
-                  <article className="group cursor-pointer overflow-hidden rounded-2xl border border-border/50 bg-card transition-all hover:border-border hover:shadow-lg">
-                    {/* Gradient Header Bar */}
-                    <div className={`h-1.5 bg-gradient-to-r ${post.gradient}`} />
-                    <div className="p-6">
+                  <article className="group cursor-pointer border-2 border-foreground bg-card p-6 shadow-[4px_4px_0px_0px_currentColor] transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_currentColor] flex flex-col justify-between h-full">
+                    <div>
                       <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                        <span className="inline-flex items-center gap-1 border border-foreground bg-muted px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">
                           <Tag className="h-3 w-3" />
                           {post.category}
                         </span>
-                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1 font-mono text-xs text-muted-foreground">
                           <Clock className="h-3 w-3" />
                           {post.readTime}
                         </span>
                       </div>
-                      <h3 className="mt-3 text-lg font-semibold leading-snug transition-colors group-hover:text-indigo-500">
+                      <h3 className="mt-3 font-black text-lg uppercase tracking-tight leading-snug group-hover:underline">
                         {post.title}
                       </h3>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-3">
                         {post.excerpt}
                       </p>
-                      <div className="mt-4 flex items-center justify-between">
-                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Calendar className="h-3 w-3" />
-                          {post.date}
-                        </span>
-                        <span className="flex items-center gap-1 text-sm font-medium text-indigo-500 opacity-0 transition-all group-hover:opacity-100">
-                          Read more
-                          <ArrowRight className="h-3.5 w-3.5" />
-                        </span>
-                      </div>
+                    </div>
+                    <div className="mt-5 flex items-center justify-between border-t border-border pt-4 font-mono text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {post.date}
+                      </span>
+                      <span className="flex items-center gap-1 font-mono text-xs font-bold uppercase tracking-wider text-foreground group-hover:underline">
+                        Read more
+                        <ArrowRight className="h-3 w-3" />
+                      </span>
                     </div>
                   </article>
                 </AnimatedItem>

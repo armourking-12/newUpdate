@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Download, Heart, Bookmark, Eye, Share2, AlertCircle } from "lucide-react";
+import { Download, Heart, Bookmark, Eye } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 export function ResourceDetailsClient({ initialResource }: { initialResource: any }) {
@@ -10,7 +10,6 @@ export function ResourceDetailsClient({ initialResource }: { initialResource: an
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    // Record view on mount
     fetch(`/api/resources/${resource._id}/view`, { method: "POST" })
       .then(res => res.json())
       .then(data => {
@@ -28,9 +27,7 @@ export function ResourceDetailsClient({ initialResource }: { initialResource: an
       return res.json();
     },
     onMutate: async () => {
-      // Save previous state for rollback
       const previous = { hasLiked: resource.hasLiked, likesCount: resource.likesCount };
-      // Optimistic update
       setResource((prev: any) => ({
         ...prev,
         hasLiked: !prev.hasLiked,
@@ -39,13 +36,11 @@ export function ResourceDetailsClient({ initialResource }: { initialResource: an
       return { previous };
     },
     onError: (_err, _vars, context) => {
-      // Revert to previous state on failure
       if (context?.previous) {
         setResource((prev: any) => ({ ...prev, ...context.previous }));
       }
     },
     onSuccess: (data) => {
-      // Sync with actual server state to prevent drift
       if (data.success) {
         setResource((prev: any) => ({
           ...prev,
@@ -91,7 +86,6 @@ export function ResourceDetailsClient({ initialResource }: { initialResource: an
 
   const downloadMutation = useMutation({
     mutationFn: async () => {
-      // Increment download securely in background
       fetch(`/api/resources/${resource._id}/download`, { method: "POST" })
         .then(() => {
           queryClient.invalidateQueries({ queryKey: ["userStats"] });
@@ -121,94 +115,92 @@ export function ResourceDetailsClient({ initialResource }: { initialResource: an
   });
 
   return (
-    <div className="mt-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-12">
-      {/* Main Info */}
-      <div className="flex-1 space-y-8">
+    <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-12">
+      <div className="flex-1 space-y-6">
         <div>
-          <h1 className="text-3xl font-bold md:text-4xl">{resource.title}</h1>
-          <p className="mt-4 text-lg text-muted-foreground">{resource.description}</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight sm:text-4xl">{resource.title}</h1>
+          <p className="mt-3 text-base leading-relaxed text-muted-foreground">{resource.description}</p>
         </div>
         
-        <div className="flex flex-wrap gap-4 border-y border-border py-6">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap gap-4 border-y-2 border-foreground py-4">
+          <div className="flex items-center gap-3">
             {resource.uploadedBy?.image ? (
-              <img src={resource.uploadedBy.image} alt="" className="h-10 w-10 rounded-full border border-border" />
+              <img src={resource.uploadedBy.image} alt="" className="h-10 w-10 border-2 border-foreground object-cover" />
             ) : (
-              <div className="h-10 w-10 rounded-full bg-indigo-500/20" />
+              <div className="h-10 w-10 border-2 border-foreground bg-muted" />
             )}
             <div>
-              <p className="text-sm font-medium leading-none">{resource.uploadedBy?.name || "Unknown Student"}</p>
-              <p className="text-xs text-muted-foreground mt-1">Uploaded {formatDistanceToNow(new Date(resource.createdAt))} ago</p>
+              <p className="font-bold text-sm uppercase tracking-tight leading-none">{resource.uploadedBy?.name || "Unknown Student"}</p>
+              <p className="font-mono text-xs text-muted-foreground mt-1">Uploaded {formatDistanceToNow(new Date(resource.createdAt))} ago</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sidebar Action Card */}
       <div className="w-full lg:w-80 flex-shrink-0">
-        <div className="sticky top-24 rounded-2xl border border-border/50 bg-card p-6 shadow-xl">
+        <div className="sticky top-24 border-2 border-foreground bg-card p-6 shadow-[4px_4px_0px_0px_currentColor]">
           <button
             onClick={() => downloadMutation.mutate()}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-500 py-3.5 text-sm font-medium text-white transition-all hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95"
+            className="flex w-full items-center justify-center gap-2 border-2 border-foreground bg-foreground py-3 font-mono text-xs font-bold uppercase tracking-wider text-background shadow-[3px_3px_0px_0px_currentColor] transition-all hover:bg-background hover:text-foreground"
           >
-            <Download className="h-5 w-5" />
+            <Download className="h-4 w-4" />
             Download Resource
           </button>
           
-          <div className="mt-6 flex justify-around border-t border-border pt-6">
+          <div className="mt-6 flex justify-around border-t-2 border-foreground pt-5">
             <button 
               onClick={() => likeMutation.mutate()}
-              className="flex flex-col items-center gap-1.5 transition-colors group"
+              className="flex flex-col items-center gap-1.5 transition-colors group cursor-pointer"
             >
-              <div className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${resource.hasLiked ? "bg-rose-500/10 text-rose-500" : "bg-muted text-muted-foreground group-hover:bg-muted/80"}`}>
-                <Heart className={`h-6 w-6 ${resource.hasLiked ? "fill-current" : ""}`} />
+              <div className={`flex h-10 w-10 items-center justify-center border-2 border-foreground transition-colors ${resource.hasLiked ? "bg-foreground text-background" : "bg-muted text-foreground group-hover:bg-muted/80"}`}>
+                <Heart className={`h-4 w-4 ${resource.hasLiked ? "fill-current" : ""}`} />
               </div>
-              <span className={`text-xs font-medium ${resource.hasLiked ? "text-rose-500" : "text-muted-foreground"}`}>{resource.likesCount || 0} Likes</span>
+              <span className="font-mono text-xs font-bold uppercase text-foreground">{resource.likesCount || 0} Likes</span>
             </button>
             <button 
               onClick={() => saveMutation.mutate()}
-              className="flex flex-col items-center gap-1.5 transition-colors group"
+              className="flex flex-col items-center gap-1.5 transition-colors group cursor-pointer"
             >
-              <div className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${resource.hasSaved ? "bg-indigo-500/10 text-indigo-500" : "bg-muted text-muted-foreground group-hover:bg-muted/80"}`}>
-                <Bookmark className={`h-6 w-6 ${resource.hasSaved ? "fill-current" : ""}`} />
+              <div className={`flex h-10 w-10 items-center justify-center border-2 border-foreground transition-colors ${resource.hasSaved ? "bg-foreground text-background" : "bg-muted text-foreground group-hover:bg-muted/80"}`}>
+                <Bookmark className={`h-4 w-4 ${resource.hasSaved ? "fill-current" : ""}`} />
               </div>
-              <span className={`text-xs font-medium ${resource.hasSaved ? "text-indigo-500" : "text-muted-foreground"}`}>{resource.hasSaved ? "Saved" : "Save"}</span>
+              <span className="font-mono text-xs font-bold uppercase text-foreground">{resource.hasSaved ? "Saved" : "Save"}</span>
             </button>
           </div>
 
-          <div className="mt-6 grid grid-cols-2 gap-4 rounded-xl bg-muted/50 p-4">
-            <div className="flex flex-col items-center justify-center p-2 text-center">
-              <Eye className="h-5 w-5 text-muted-foreground mb-1" />
-              <span className="text-lg font-bold">{resource.views?.toLocaleString() || 0}</span>
-              <span className="text-xs text-muted-foreground">Views</span>
+          <div className="mt-6 grid grid-cols-2 divide-x-2 divide-foreground border-2 border-foreground bg-muted/30">
+            <div className="flex flex-col items-center justify-center p-3 text-center">
+              <Eye className="h-4 w-4 text-foreground mb-1" />
+              <span className="text-lg font-black">{resource.views?.toLocaleString() || 0}</span>
+              <span className="font-mono text-[10px] uppercase font-bold text-muted-foreground">Views</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-2 text-center">
-              <Download className="h-5 w-5 text-muted-foreground mb-1" />
-              <span className="text-lg font-bold">{resource.downloads?.toLocaleString() || 0}</span>
-              <span className="text-xs text-muted-foreground">Downloads</span>
+            <div className="flex flex-col items-center justify-center p-3 text-center">
+              <Download className="h-4 w-4 text-foreground mb-1" />
+              <span className="text-lg font-black">{resource.downloads?.toLocaleString() || 0}</span>
+              <span className="font-mono text-[10px] uppercase font-bold text-muted-foreground">Downloads</span>
             </div>
           </div>
           
-          <div className="mt-6 space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Type</span>
-              <span className="font-medium">{resource.type}</span>
+          <div className="mt-6 space-y-2 border-t-2 border-foreground pt-4 font-mono text-xs">
+            <div className="flex justify-between border-b border-border pb-1.5">
+              <span className="font-bold uppercase text-muted-foreground">Type</span>
+              <span className="font-bold uppercase text-foreground">{resource.type}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">University</span>
-              <span className="font-medium text-right max-w-[150px] truncate" title={resource.university}>{resource.university}</span>
+            <div className="flex justify-between border-b border-border pb-1.5">
+              <span className="font-bold uppercase text-muted-foreground">University</span>
+              <span className="font-bold uppercase text-right max-w-[150px] truncate" title={resource.university}>{resource.university}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Course</span>
-              <span className="font-medium text-right max-w-[150px] truncate" title={resource.course}>{resource.course}</span>
+            <div className="flex justify-between border-b border-border pb-1.5">
+              <span className="font-bold uppercase text-muted-foreground">Course</span>
+              <span className="font-bold uppercase text-right max-w-[150px] truncate" title={resource.course}>{resource.course}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Semester</span>
-              <span className="font-medium">{resource.semester}</span>
+            <div className="flex justify-between border-b border-border pb-1.5">
+              <span className="font-bold uppercase text-muted-foreground">Semester</span>
+              <span className="font-bold uppercase text-foreground">{resource.semester}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Year</span>
-              <span className="font-medium">{resource.year}</span>
+            <div className="flex justify-between pt-0.5">
+              <span className="font-bold uppercase text-muted-foreground">Year</span>
+              <span className="font-bold uppercase text-foreground">{resource.year}</span>
             </div>
           </div>
         </div>
